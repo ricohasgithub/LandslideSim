@@ -15,14 +15,23 @@ def plot_distributions(n_hw, n_v0, n_alpha):
     
     plt.show()
 
-def gen_dataset(in_dim):
+# Returns n x n matrix (n = in_dim)
+def gen_dataset(in_dim, constant=True):
 
     # Generate random hw: normal distribution from 0 - 100m
     n_hw = np.random.normal(50.0, 10.0, in_dim)
+
     # Generate random v0
-    n_v0 = np.random.normal(0.5, 0.1, in_dim)
+    if not constant:
+        n_v0 = np.random.normal(0.5, 0.1, in_dim)
+    else:
+        n_v0 = np.full(in_dim, 0.1)
+        
     # Generate random alpha
-    n_alpha = np.random.normal(5.0, math.sqrt(2.0), in_dim)
+    if not constant:
+        n_alpha = np.random.normal(5.0, math.sqrt(2.0), in_dim)
+    else:
+        n_alpha = np.full(in_dim, 2.5)
 
     # Calculate output values
     l_left_hand_side = []
@@ -40,4 +49,9 @@ def gen_dataset(in_dim):
     right_hand_side = torch.stack([v0, alpha, hw])
     left_hand_side = torch.tensor(n_left_hand_side)
 
+    plt.scatter(hw, left_hand_side)
+    plt.show()
+
     return right_hand_side, left_hand_side
+
+gen_dataset(1000)
