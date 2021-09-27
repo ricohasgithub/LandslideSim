@@ -3,6 +3,8 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 
+import random
+
 import matplotlib.pyplot as plt
 
 from torchdiffeq import odeint
@@ -55,3 +57,32 @@ class ODE_RNN(nn.Module):
         out = self.decoder(h)
         return out
         
+def train(model, data, epochs):
+
+    optimizer = optim.Adam(model.parameters(), lr=0.01)
+    loss_function = nn.MSELoss()
+
+    loss_history = []
+
+    for epoch in range(epochs):
+
+        random.shuffle(data)
+        epoch_loss = []
+        
+        for i, (example, label) in enumerate(data):
+
+            optimizer.zero_grad()
+            prediction = model(example[0], example[1])
+
+            loss = loss_function(prediction, label)
+            loss.backward()
+            optimizer.step()
+
+            epoch_loss.append(loss.detach().numpy())
+
+        loss_history.append(sum(epoch_loss) / len(examples))
+        epoch_loss = []
+
+        print('Epoch {:04d} | Total Loss {:.6f}'.format(epoch, loss_history[epoch]))
+
+    return loss_history
