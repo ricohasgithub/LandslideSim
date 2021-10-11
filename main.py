@@ -14,7 +14,7 @@ def train(model, data_gen, epochs):
     right_hand_side = data_gen[1]
     left_hand_side = data_gen[2]
 
-    examples = torch.stack(examples_hw, left_hand_side)
+    examples = torch.stack((examples_hw, left_hand_side))
     print(examples.size())
 
     optimizer = optim.Adam(model.parameters(), lr=0.01)
@@ -24,11 +24,30 @@ def train(model, data_gen, epochs):
 
     for epoch in range(epochs):
 
-        random.shuffle()
+        random.shuffle(examples)
+        epoch_loss = []
+        
+        for i, (example, label) in enumerate(examples):
+
+            optimizer.zero_grad()
+            prediction = model(example)
+
+            loss = loss_function(prediction, label)
+            loss.backward()
+            optimizer.step()
+
+            epoch_loss.append(loss.detach().numpy())
+
+        loss_history.append(sum(epoch_loss) / len(examples))
+        epoch_loss = []
+
+        print('Epoch {:04d} | Total Loss {:.6f}'.format(epoch, loss_history[epoch]))
+
+    return loss_history
 
 if __name__ == "__main__":
 
     # Get dataset for training
     data_gen = gen_dataset(1000)
     feedforward_nn = Feedforward_NN()
-    train(data_gen, feedforward_nn, 30)
+    train(feedforward_nn, data_gen, 30)
