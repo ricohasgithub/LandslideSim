@@ -10,6 +10,21 @@ import matplotlib.pyplot as plt
 from torchdiffeq import odeint
 from generator import gen_dataset
 
+class Feedforward_NN(nn.Module):
+
+    def __init__(self):
+        super(Feedforward_NN, self).__init__()
+        self.linear1 = nn.Linear(1, 4)
+        self.hidden = nn.Linear(4, 4)
+        self.linear2 = nn.Linear(4, 1)
+        self.nonlinear = nn.Tanh()
+
+    def forward(self, x):
+        output = self.nonlinear(self.linear1(x))
+        output = self.nonlinear(self.hidden(output))
+        output = self.nonlinear(self.linear2(output))
+        return self.nonlinear(output)
+
 '''
     Linear Model: Neural ODE with time axis swapped for hw variable
 '''
@@ -80,7 +95,7 @@ def train(model, data, epochs):
 
             epoch_loss.append(loss.detach().numpy())
 
-        loss_history.append(sum(epoch_loss) / len(examples))
+        loss_history.append(sum(epoch_loss) / len(data))
         epoch_loss = []
 
         print('Epoch {:04d} | Total Loss {:.6f}'.format(epoch, loss_history[epoch]))

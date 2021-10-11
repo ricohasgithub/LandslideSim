@@ -49,9 +49,6 @@ def gen_dataset(in_dim, constant=True):
     right_hand_side = torch.stack([v0, alpha, hw])
     left_hand_side = torch.tensor(n_left_hand_side)
 
-    plt.scatter(hw, left_hand_side)
-    plt.show()
-
-    return right_hand_side, left_hand_side
+    return (hw, right_hand_side, left_hand_side)
 
 gen_dataset(1000)
