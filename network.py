@@ -14,9 +14,9 @@ class Feedforward_NN(nn.Module):
 
     def __init__(self):
         super(Feedforward_NN, self).__init__()
-        self.linear1 = nn.Linear(1, 4)
-        self.hidden = nn.Linear(4, 4)
-        self.linear2 = nn.Linear(4, 1)
+        self.linear1 = nn.Linear(1, 50)
+        self.hidden = nn.Linear(50, 50)
+        self.linear2 = nn.Linear(50, 1)
         self.nonlinear = nn.Tanh()
 
     def forward(self, x):
