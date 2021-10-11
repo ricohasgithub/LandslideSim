@@ -14,7 +14,7 @@ def train(model, data_gen, epochs):
     left_hand_side = data_gen[2]
 
     examples = torch.stack((examples_hw, left_hand_side))
-    examples = torch.chunk(examples, 50, dim=1)
+    examples = torch.chunk(examples, 1000, dim=1)
     examples = torch.stack(examples)
 
     # examples_hw = torch.split(examples_hw, 50)
@@ -30,17 +30,15 @@ def train(model, data_gen, epochs):
 
     for epoch in range(epochs):
 
+        random.shuffle(examples)
         epoch_loss = []
         
         for i, (example, label) in enumerate(examples):
 
-            print("example: ", example.size())
-            print("label: ", label.size())
-
             optimizer.zero_grad()
-            prediction = model(example)
+            prediction = model(example.float())
 
-            loss = loss_function(prediction, label)
+            loss = loss_function(prediction, label.float())
             loss.backward()
             optimizer.step()
 
@@ -59,5 +57,3 @@ if __name__ == "__main__":
     data_gen = gen_dataset(1000)
     feedforward_nn = Feedforward_NN()
     train(feedforward_nn, data_gen, 30)
-
-    print(feedforward_nn(100))
