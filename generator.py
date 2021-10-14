@@ -55,8 +55,8 @@ def gen_lin_dataset(in_dim, constant=True):
 def gen_exp_dataset(in_dim, constant=True):
 
     # Generate random hw: normal distribution from 0 - 100m
-    # n_hw = np.random.normal(50.0, 10.0, in_dim)
-    n_hw = np.linspace(0, 100, in_dim)
+    n_hw = np.random.normal(50.0, 10.0, in_dim)
+    # n_hw = np.linspace(0, 100, in_dim)
     n_exp_hw = np.square(n_hw)
 
     # Generate random v0
@@ -87,8 +87,8 @@ def gen_exp_dataset(in_dim, constant=True):
     right_hand_side = torch.stack([v0, alpha, hw])
     left_hand_side = torch.tensor(n_left_hand_side)
 
-    plt.scatter(n_hw, left_hand_side)
-    plt.show()
+    # plt.scatter(n_hw, left_hand_side)
+    # plt.show()
 
     return (hw, right_hand_side, left_hand_side)
 
