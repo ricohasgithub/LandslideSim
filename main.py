@@ -43,7 +43,7 @@ def train(model, data_gen, epochs):
 
         print('Epoch {:04d} | Total Loss {:.6f}'.format(epoch, loss_history[epoch]))
 
-    test_data_gen = gen_dataset(100)
+    test_data_gen = gen_exp_dataset(100)
     test_examples_hw = test_data_gen[0]
     test_left_hand_side = test_data_gen[2]
 
@@ -60,6 +60,6 @@ def train(model, data_gen, epochs):
 if __name__ == "__main__":
 
     # Get dataset for training
-    data_gen = gen_dataset(1000)
+    data_gen = gen_exp_dataset(1000)
     feedforward_nn = Feedforward_NN()
     train(feedforward_nn, data_gen, 30)

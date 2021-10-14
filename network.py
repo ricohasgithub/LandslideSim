@@ -8,7 +8,6 @@ import random
 import matplotlib.pyplot as plt
 
 from torchdiffeq import odeint
-from generator import gen_dataset
 
 class Feedforward_NN(nn.Module):
 
@@ -26,7 +25,13 @@ class Feedforward_NN(nn.Module):
         return output
 
 '''
+
     Linear Model: Neural ODE with time axis swapped for hw variable
+
+    u_t = -u + C * exp(u)
+    u_t -> time derivative
+    C -> constant
+
 '''
 
 class ODE_Func(nn.Module):
