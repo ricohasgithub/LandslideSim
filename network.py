@@ -9,6 +9,8 @@ import matplotlib.pyplot as plt
 
 from torchdiffeq import odeint
 
+from generator import gen_lin_dataset
+
 class Feedforward_NN(nn.Module):
 
     def __init__(self):
@@ -19,32 +21,10 @@ class Feedforward_NN(nn.Module):
         self.nonlinear = nn.ReLU()
 
     def forward(self, x):
-        output = self.nonlinear(self.linear1(x))
-        output = self.nonlinear(self.hidden(output))
+        output = self.linear1(x)
+        output = self.hidden(output)
         output = self.nonlinear(self.linear2(output))
         return output
-
-'''
-
-    Linear Model: Neural ODE with time axis swapped for hw variable
-
-    u_t = -u + C * exp(u)
-    u_t -> time derivative
-    C -> constant
-
-'''
-
-class ODE_Func(nn.Module):
-
-    def __init__(self, hidden_dim):
-        super(ODE_Func, self).__init__()
-        self.linear = nn.Linear(hidden_dim, hidden_dim)
-        self.nonlinear = nn.Tanh()
-
-    def forward(self, t, x):
-        out = self.nonlinear(self.linear(x))
-        return out
-
 
 def ff_train(model, data_gen, epochs):
 
@@ -81,7 +61,7 @@ def ff_train(model, data_gen, epochs):
 
         print('Epoch {:04d} | Total Loss {:.6f}'.format(epoch, loss_history[epoch]))
 
-    test_data_gen = gen_exp_dataset(100)
+    test_data_gen = gen_lin_dataset(100)
     test_examples_hw = test_data_gen[0]
     test_left_hand_side = test_data_gen[2]
 
@@ -94,6 +74,27 @@ def ff_train(model, data_gen, epochs):
         print("Label: ", test_label)
 
     return loss_history
+
+'''
+
+    Linear Model: Neural ODE with time axis swapped for hw variable
+
+    u_t = -u + C * exp(u)
+    u_t -> time derivative
+    C -> constant
+
+'''
+
+class ODE_Func(nn.Module):
+
+    def __init__(self, hidden_dim):
+        super(ODE_Func, self).__init__()
+        self.linear = nn.Linear(hidden_dim, hidden_dim)
+        self.nonlinear = nn.ReLU()
+
+    def forward(self, t, x):
+        out = self.nonlinear(self.linear(x))
+        return out
 
 class ODE_RNN(nn.Module):
 
