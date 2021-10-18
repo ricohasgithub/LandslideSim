@@ -56,7 +56,7 @@ def gen_exp_dataset(in_dim, constant=True):
 
     # Generate random hw: normal distribution from 0 - 100m acts as time t
     # n_hw = np.random.normal(50.0, 10.0, in_dim)
-    n_hw = np.linspace(0, 1000, in_dim)
+    n_hw = np.linspace(0, 10, in_dim)
     n_exp_hw = np.square(n_hw)
 
     # Generate random v0
@@ -71,50 +71,15 @@ def gen_exp_dataset(in_dim, constant=True):
     else:
         n_alpha = np.full(in_dim, 2.5)
 
-    # Calculate output values
-    l_left_hand_side = []
-    l_right_hand_side_x = []
-    l_right_hand_side_t = []
+    hw = torch.tensor(n_hw).float()
+    v0 = torch.tensor(n_v0).float()
+    alpha = torch.tensor(n_alpha).float()
+    exp_hw = torch.tensor(n_exp_hw).float()
 
-    right_hand_side = []
-    right_hand_side_t = []
-
-    for i in range(in_dim - 10):
-
-        if i%10 == 0 and not(i == 0):
-            
-            l_left_hand_side.append(n_v0[i] + n_alpha[i] * n_exp_hw[i])
-
-            n_right_hand_side = torch.tensor(np.array(l_right_hand_side_x))
-            n_right_hand_side_t = torch.tensor(np.array(l_right_hand_side_t))
-
-            right_hand_side.append(n_right_hand_side)
-            right_hand_side_t.append(n_right_hand_side_t)
-
-            l_right_hand_side_x = []
-            l_right_hand_side_t = []
-
-        elif not(i==0):
-            l_right_hand_side_x.append(n_v0[i] + n_alpha[i] * n_exp_hw[i])
-            l_right_hand_side_t.append(n_hw[0])
-
-    n_left_hand_side = np.array(l_left_hand_side)
-
-    # Convert to torch tensors for processing
-    hw = torch.tensor(n_hw)
-    v0 = torch.tensor(n_v0)
-    alpha = torch.tensor(n_alpha)
-
-    # Create input data tensor
-    right_hand_side = torch.stack(right_hand_side)
-    right_hand_side_t = torch.stack(right_hand_side_t)
-
-    right_hand_side = torch.stack([right_hand_side, right_hand_side_t])
-    left_hand_side = torch.tensor(n_left_hand_side)
+    train_window = 10
+    data = [((exp_hw[i:i+train_window].reshape(-1, 1, 1), hw[i:i+train_window].reshape(-1, 1, 1)), (exp_hw[i+train_window:i+train_window+1].reshape(1, -1))) for i in range(in_dim - train_window)]
 
     # plt.plot(right_hand_side, left_hand_side)
     # plt.show()
 
-    return (right_hand_side, left_hand_side)
-
-gen_exp_dataset(1000)
+    return data

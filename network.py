@@ -117,15 +117,13 @@ class ODE_RNN(nn.Module):
         
         t = t.reshape(-1).float()
         h = torch.zeros(self.hidden_dim, 1)
-        h_i = torch.zeros(self.hidden_dim, 1)
+        h_i = torch.zeros(1, self.hidden_dim)
 
         # RNN iteration
         for i, x_i in enumerate(x):
             x_i = torch.reshape(x_i.float(), (1, 1))
             if i > 0:
-                h_i = odeint(self.ode_func, h, t[i-1 : i+1])[1]
-            else:
-                h_i = torch.transpose(h_i, 0, 1)
+                h_i = odeint(self.ode_func, h, t[i-1 : i+1], method="euler")[1]
             h = self.nonlinear(self.linear_in(x_i) + self.linear_hidden(h_i))
 
         out = self.decoder(h)
@@ -140,7 +138,7 @@ def ode_train(model, data, epochs):
 
     for epoch in range(epochs):
 
-        # random.shuffle(data)
+        random.shuffle(data)
         epoch_loss = []
         
         for i, (example, label) in enumerate(data):
@@ -159,4 +157,9 @@ def ode_train(model, data, epochs):
 
         print('Epoch {:04d} | Total Loss {:.6f}'.format(epoch, loss_history[epoch]))
 
+        for i, (example, label) in enumerate(data):
+            print("Label: ", label)
+            print("Prediction: ", model(example[0], example[1]))
+            break
+        
     return loss_history
