@@ -137,12 +137,14 @@ def ode_train(model, data, epochs):
 
     for epoch in range(epochs):
 
-        random.shuffle(data)
+        # random.shuffle(data)
         epoch_loss = []
         
         for i, (example, label) in enumerate(data):
 
             optimizer.zero_grad()
+            print(example[0].size())
+            print(example[1].size())
             prediction = model(example[0], example[1])
 
             loss = loss_function(prediction, label)
