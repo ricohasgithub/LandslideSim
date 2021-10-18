@@ -90,7 +90,7 @@ class ODE_Func(nn.Module):
     def __init__(self, hidden_dim):
         super(ODE_Func, self).__init__()
         self.linear = nn.Linear(hidden_dim, hidden_dim)
-        self.nonlinear = nn.ReLU()
+        self.nonlinear = nn.Tanh()
 
     def forward(self, t, x):
         out = self.nonlinear(self.linear(x))
@@ -121,8 +121,11 @@ class ODE_RNN(nn.Module):
 
         # RNN iteration
         for i, x_i in enumerate(x):
+            x_i = torch.reshape(x_i.float(), (1, 1))
             if i > 0:
                 h_i = odeint(self.ode_func, h, t[i-1 : i+1])[1]
+            else:
+                h_i = torch.transpose(h_i, 0, 1)
             h = self.nonlinear(self.linear_in(x_i) + self.linear_hidden(h_i))
 
         out = self.decoder(h)
@@ -143,8 +146,6 @@ def ode_train(model, data, epochs):
         for i, (example, label) in enumerate(data):
 
             optimizer.zero_grad()
-            print(example[0].size())
-            print(example[1].size())
             prediction = model(example[0], example[1])
 
             loss = loss_function(prediction, label)
