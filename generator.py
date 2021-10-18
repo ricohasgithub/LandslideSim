@@ -55,8 +55,8 @@ def gen_lin_dataset(in_dim, constant=True):
 def gen_exp_dataset(in_dim, constant=True):
 
     # Generate random hw: normal distribution from 0 - 100m
-    n_hw = np.random.normal(50.0, 10.0, in_dim)
-    # n_hw = np.linspace(0, 100, in_dim)
+    # n_hw = np.random.normal(50.0, 10.0, in_dim)
+    n_hw = np.linspace(0, 1000, in_dim)
     n_exp_hw = np.square(n_hw)
 
     # Generate random v0
