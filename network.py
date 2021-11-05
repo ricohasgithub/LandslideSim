@@ -163,3 +163,21 @@ def ode_train(model, data, epochs):
             break
         
     return loss_history
+
+class Spectral_Conv_1D(nn.Module):
+
+    def __init__(self, input_dim, output_dim, modes):
+
+        super(Spectral_Conv_1D, self).__init__()
+
+        self.input_dim = input_dim
+        self.output_dim = output_dim
+        self.modes = modes
+
+        self.scale = (1 / (self.input_dim * self.output_dim))
+        self.weights = nn.Parameter(self.scale * torch.rand(self.input_dim, self.output_dim, self.modes, dtype=torch.cfloat))
+
+class Fourier_Neural_Operator_1D(nn.Module):
+
+    def __init__(self, modes, width):
+        super(Fourier_Neural_Operator_1D, self).__init__()
