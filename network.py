@@ -83,6 +83,16 @@ def ff_train(model, data_gen, epochs):
     u_t -> time derivative
     C -> constant
 
+    ODE-RNN Network
+        code licensed from: https://github.com/rtqichen/torchdiffeq
+
+    @article{chen2018neuralode,
+        title={Neural Ordinary Differential Equations},
+        author={Chen, Ricky T. Q. and Rubanova, Yulia and Bettencourt, Jesse and Duvenaud, David},
+        journal={Advances in Neural Information Processing Systems},
+        year={2018}
+    }
+
 '''
 
 class ODE_Func(nn.Module):
@@ -164,6 +174,22 @@ def ode_train(model, data, epochs):
         
     return loss_history
 
+'''
+
+    Fourier Neural Operator
+        code licensed from: https://github.com/zongyi-li/fourier_neural_operator/blob/master/fourier_1d.py
+    
+    @misc{li2020fourier,
+        title={Fourier Neural Operator for Parametric Partial Differential Equations}, 
+        author={Zongyi Li and Nikola Kovachki and Kamyar Azizzadenesheli and Burigede Liu and Kaushik Bhattacharya and Andrew Stuart and Anima Anandkumar},
+        year={2020},
+        eprint={2010.08895},
+        archivePrefix={arXiv},
+        primaryClass={cs.LG}
+    }
+
+'''
+
 class Spectral_Conv_1D(nn.Module):
 
     def __init__(self, input_dim, output_dim, modes):
@@ -176,6 +202,25 @@ class Spectral_Conv_1D(nn.Module):
 
         self.scale = (1 / (self.input_dim * self.output_dim))
         self.weights = nn.Parameter(self.scale * torch.rand(self.input_dim, self.output_dim, self.modes, dtype=torch.cfloat))
+
+    # Complex multiplication
+    def compl_mul1d(self, input, weights):
+        # (batch, in_channel, x ), (in_channel, out_channel, x) -> (batch, out_channel, x)
+        return torch.einsum("bix,iox->box", input, weights)
+
+    def forward(self, x):
+
+        batchsize = x.shape[0]
+        # Compute Fourier coeffcients up to factor of e^(- something constant)
+        x_ft = torch.fft.rfft(x)
+
+        # Multiply relevant Fourier modes
+        out_ft = torch.zeros(batchsize, self.out_channels, x.size(-1)//2 + 1,  device=x.device, dtype=torch.cfloat)
+        out_ft[:, :, :self.modes1] = self.compl_mul1d(x_ft[:, :, :self.modes1], self.weights1)
+
+        #Return to physical space
+        x = torch.fft.irfft(out_ft, n=x.size(-1))
+        return x
 
 class Fourier_Neural_Operator_1D(nn.Module):
 
