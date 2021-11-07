@@ -5,11 +5,10 @@ import torch.nn.functional as F
 import torch.optim as optim
 
 import random
-
+import numpy as np
 import matplotlib.pyplot as plt
 
 from torchdiffeq import odeint
-
 from generator import gen_lin_dataset
 
 class Feedforward_NN(nn.Module):
